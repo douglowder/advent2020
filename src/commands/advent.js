@@ -43,35 +43,35 @@ const validDays = Array.from(moduleMap.keys())
 
 const runSolutionForDay = (dayString, isTest, cmd) => {
   if (moduleMap.size === 0) {
-    cmd.log('  No Advent of Code solutions have been implemented');
+    console.log('  No Advent of Code solutions have been implemented');
     return;
   }
   if (!moduleMap.has(dayString)) {
-    cmd.log(`Day must be either "all", "latest", or one of ${validDays}`);
+    console.log(`Day must be either "all", "latest", or one of ${validDays}`);
     return;
   }
   if (isTest && !testInputMap.has(dayString)) {
-    cmd.log('  Source module exists, but no test input file is provided');
+    console.log('  Source module exists, but no test input file is provided');
     return;
   }
   if (!isTest && !inputMap.has(dayString)) {
-    cmd.log('  Source module exists, but no input file is provided');
+    console.log('  Source module exists, but no input file is provided');
     return;
   }
   const inputPath = isTest
     ? testInputMap.get(dayString)
     : inputMap.get(dayString);
   const moduleForDay = moduleMap.get(dayString);
-  cmd.log(
+  console.log(
     isTest ? `Day ${dayString} test solutions:` : `Day ${dayString} solutions:`,
   );
-  cmd.log('   ' + moduleForDay.part1(inputPath));
-  cmd.log('   ' + moduleForDay.part2(inputPath));
+  console.log('   ' + moduleForDay.part1(inputPath));
+  console.log('   ' + moduleForDay.part2(inputPath));
 };
 
 const runSolutionForAllDays = (isTest, cmd) => {
   if (moduleMap.size === 0) {
-    cmd.log('  No Advent of Code solutions have been implemented');
+    console.log('  No Advent of Code solutions have been implemented');
     return;
   }
   for (let day of validDays) {
@@ -82,7 +82,7 @@ const runSolutionForAllDays = (isTest, cmd) => {
 
 const runSolutionForLatestDay = (isTest, cmd) => {
   if (moduleMap.size === 0) {
-    cmd.log('  No Advent of Code solutions have been implemented');
+    console.log('  No Advent of Code solutions have been implemented');
     return;
   }
   const day = validDays[validDays.length - 1];
@@ -101,19 +101,19 @@ class AdventCommand extends Command {
       const isTest = flags.test || false;
       switch (day) {
         case 'all':
-          this.log('Running solutions for all AoC days');
+          console.log('Running solutions for all AoC days');
           runSolutionForAllDays(isTest, this);
           break;
         case 'latest':
-          this.log('Running solution for latest AoC day');
+          console.log('Running solution for latest AoC day');
           runSolutionForLatestDay(isTest, this);
           break;
         default:
-          this.log(`Running AoC solution for day ${day}`);
+          console.log(`Running AoC solution for day ${day}`);
           runSolutionForDay(day, isTest, this);
       }
     } catch (e) {
-      this.log('  Stack: ' + e.stack);
+      console.error('  Stack: ' + e.stack);
     }
   }
 }
