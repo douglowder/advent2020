@@ -23,6 +23,7 @@ USAGE
 OPTIONS
   -d, --day=day  Which day to run solutions for, or "all" to run all days, or "latest" to run the most recent day
   -h, --help     Show CLI help
+  -p, --printDescription  If true, print the problem description for the day before running the solution
   -t, --test     If true, use the test input instead of the real input
 
 DESCRIPTION

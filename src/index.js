@@ -5,6 +5,7 @@ const fs = require('fs');
 const moduleDir = `${__dirname}/modules`;
 const inputDir = `${__dirname}/input`;
 const testInputDir = `${__dirname}/testInput`;
+const descriptionDir = `${__dirname}/descriptions`;
 
 const moduleMap = new Map();
 try {
@@ -32,7 +33,20 @@ try {
   fs.readdirSync(testInputDir).forEach((file) => {
     const match = file.match(/(input)([0-9][0-9]).txt/);
     if (match && match.length === 3) {
-      testInputMap.set(match[2], `${testInputDir}/input${match[2]}.txt`);
+      testInputMap.set(match[2], `${testInputDir}/${match[1]}${match[2]}.txt`);
+    }
+  });
+} catch (e) {} // directory does not exist
+
+const descriptionMap = new Map();
+try {
+  fs.readdirSync(descriptionDir).forEach((file) => {
+    const match = file.match(/(advent)([0-9][0-9]).txt/);
+    if (match && match.length === 3) {
+      descriptionMap.set(
+        match[2],
+        `${descriptionDir}/${match[1]}${match[2]}.txt`,
+      );
     }
   });
 } catch (e) {} // directory does not exist
@@ -90,6 +104,16 @@ const runSolutionForLatestDay = (isTest, cmd) => {
   runSolutionForDay(dayString, isTest, cmd);
 };
 
+const printDescriptionForDay = (dayString) => {
+  if (!descriptionMap.has(dayString)) {
+    console.log(`Day must be one of ${validDays}`);
+    return;
+  }
+  const descriptionPath = descriptionMap.get(dayString);
+  const description = fs.readFileSync(descriptionPath, 'utf-8');
+  console.log(description);
+};
+
 class AdventCommand extends Command {
   async run() {
     try {
@@ -103,6 +127,10 @@ class AdventCommand extends Command {
         day = `0${day}`;
       }
       const isTest = flags.test || false;
+      const printDescription = flags.printDescription || false;
+      if (printDescription) {
+        printDescriptionForDay(day);
+      }
       switch (day) {
         case 'all':
           console.log('Running solutions for all AoC days');
@@ -143,6 +171,11 @@ AdventCommand.flags = {
   test: flags.boolean({
     char: 't',
     description: 'If true, use the test input instead of the real input',
+  }),
+  printDescription: flags.boolean({
+    char: 'p',
+    description:
+      'If true, print the problem description for the day before running the solution',
   }),
 };
 
