@@ -10,7 +10,7 @@
       "name": "Run latest",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/bin/run",
-      "args": []
+      "args": ["--day=latest"]
     },
     {
       "type": "node",
@@ -20,7 +20,7 @@
         "<node_internals>/**"
       ],
       "program": "${workspaceFolder}/bin/run",
-      "args": [
+      "args": ["--day=latest",
         "--test"
       ]
     },
