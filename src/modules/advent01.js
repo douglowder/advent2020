@@ -1,11 +1,11 @@
 const fs = require('fs');
 
-const readInput = inputFilePath => {
+const readInput = (inputFilePath) => {
   const input = fs
     .readFileSync(inputFilePath, 'utf-8')
     .trim()
     .split('\n')
-    .map(n => {
+    .map((n) => {
       return parseInt(n);
     });
   input.sort((n1, n2) => {
@@ -14,35 +14,22 @@ const readInput = inputFilePath => {
   return input;
 };
 
-const part1 = inputFilePath => {
+const part1 = (inputFilePath) => {
   const input = readInput(inputFilePath);
   const inputSet = new Set(input);
-  for (let i = 0; i < input.length; i++) {
-    if (input[i] >= 2020) {
-      break;
-    }
-    if (inputSet.has(2020 - input[i])) {
-      return input[i] * (2020 - input[i]);
-    }
-  }
+  return input
+    .filter((n) => inputSet.has(2020 - n))
+    .map((n) => n * (2020 - n))[0];
 };
 
-const part2 = inputFilePath => {
+const part2 = (inputFilePath) => {
   const input = readInput(inputFilePath);
   const inputSet = new Set(input);
-  for (let i = 0; i < input.length - 1; i++) {
-    if (input[i] >= 2020) {
-      break;
-    }
-    for (let j = i + 1; j < input.length; j++) {
-      if (input[i] + input[j] >= 2020) {
-        break;
-      }
-      if (inputSet.has(2020 - input[i] - input[j])) {
-        return input[i] * input[j] * (2020 - input[i] - input[j]);
-      }
-    }
-  }
+  return input.map((n, i) =>
+    input
+      .filter((m, j) => j > i && inputSet.has(2020 - m - n))
+      .map((m) => m * n * (2020 - m - n)),
+  )[0];
 };
 
 module.exports = {
