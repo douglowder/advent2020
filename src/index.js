@@ -2,16 +2,16 @@ const {Command, flags} = require('@oclif/command');
 
 const fs = require('fs');
 
-const moduleDir = `${__dirname}/../modules`;
-const inputDir = `${__dirname}/../input`;
-const testInputDir = `${__dirname}/../testInput`;
+const moduleDir = `${__dirname}/modules`;
+const inputDir = `${__dirname}/input`;
+const testInputDir = `${__dirname}/testInput`;
 
 const moduleMap = new Map();
 try {
   fs.readdirSync(moduleDir).forEach((file) => {
     const match = file.match(/(advent)([0-9][0-9]).js/);
     if (match && match.length === 3) {
-      const module = require('../modules/' + match[1] + match[2]);
+      const module = require('./modules/' + match[1] + match[2]);
       moduleMap.set(match[2], module);
     }
   });
@@ -94,7 +94,11 @@ class AdventCommand extends Command {
   async run() {
     try {
       const {flags} = this.parse(AdventCommand);
-      let day = flags.day || 'all';
+      let day = flags.day;
+      if (!day) {
+        this._help();
+        return;
+      }
       if (day.length === 1) {
         day = `0${day}`;
       }
@@ -113,8 +117,14 @@ class AdventCommand extends Command {
           runSolutionForDay(day, isTest, this);
       }
     } catch (e) {
-      console.error('  Stack: ' + e.stack);
+      if (e.code !== 'EEXIT') {
+        console.error('  Stack: ' + e.stack);
+      }
+      const oclifHandler = require('@oclif/errors/handle');
+      // do any extra work with error
+      return oclifHandler(e);
     }
+    return 0;
   }
 }
 
@@ -124,9 +134,9 @@ Each solution is a module in \`src/modules\`, and exports two methods, \`part1(i
 `;
 
 AdventCommand.flags = {
+  help: flags.help({char: 'h', description: 'Show CLI help'}),
   day: flags.string({
     char: 'd',
-    default: 'latest',
     description:
       'Which day to run solutions for, or "all" to run all days, or "latest" to run the most recent day',
   }),
@@ -135,5 +145,7 @@ AdventCommand.flags = {
     description: 'If true, use the test input instead of the real input',
   }),
 };
+
+AdventCommand.usage = '--day <all|latest|1|2|3|...|25> <--test>';
 
 module.exports = AdventCommand;

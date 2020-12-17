@@ -10,15 +10,31 @@
       "name": "Run latest",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/bin/run",
-      "args": ["advent"]
+      "args": []
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Test latest",
-      "skipFiles": ["<node_internals>/**"],
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
       "program": "${workspaceFolder}/bin/run",
-      "args": ["advent", "--test"]
+      "args": [
+        "--test"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Help",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}/bin/run",
+      "args": [
+        "--help"
+      ]
     }
   ]
 }

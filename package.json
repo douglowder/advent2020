@@ -36,11 +36,7 @@
   "license": "MIT",
   "main": "src/index.js",
   "oclif": {
-    "commands": "./src/commands",
-    "bin": "advent2020",
-    "plugins": [
-      "@oclif/plugin-help"
-    ]
+    "bin": "advent2020"
   },
   "repository": "dlowder-salesforce/advent2020",
   "scripts": {
