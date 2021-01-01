@@ -16,7 +16,9 @@ try {
       moduleMap.set(match[2], module);
     }
   });
-} catch (e) {} // directory does not exist
+} catch (e) {
+  console.log(e.stack);
+} // directory does not exist
 
 const inputMap = new Map();
 try {
