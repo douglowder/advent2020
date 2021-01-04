@@ -1,127 +1,43 @@
 class CircularBuffer {
+  // Implement as a simple array, where array position is the value (- 1), and
+  // array contents points to the next value in the buffer
   constructor(a) {
-    this.map = new Map();
-    this.current = null;
-    if (a && a.length > 0) {
-      let c = a.shift();
-      this.current = c;
-      this.insert(c);
-      for (let n of a) {
-        this.insert(n, c);
-        c = n;
-      }
-    }
-  }
-  size() {
-    return this.map.size;
-  }
-  insert(n, m) {
-    if (this.map.size === 0) {
-      // Insert n and have it point to itself
-      this.map.set(n, {
-        value: n,
-        prev: n,
-        next: n,
-      });
-      return;
-    }
-    if (m && this.map.has(m)) {
-      if (this.map.size === 1) {
-        this.map.set(m, {
-          value: m,
-          next: n,
-          prev: n,
-        });
-        this.map.set(n, {
-          value: n,
-          next: m,
-          prev: m,
-        });
-      } else {
-        // n goes after m
-        const before_n = this.map.get(m);
-        const after_n = this.map.get(before_n.next);
-        this.map.set(n, {
-          value: n,
-          prev: before_n.value,
-          next: after_n.value,
-        });
-        this.map.set(before_n.value, {
-          value: before_n.value,
-          prev: before_n.prev,
-          next: n,
-        });
-        this.map.set(after_n.value, {
-          value: after_n.value,
-          prev: n,
-          next: after_n.next,
-        });
-      }
-      return;
-    }
-  }
-  insertArray(a, m) {
-    // insert array of values after m
-    let c = m;
+    this.size = a.length;
+    this.array = new Array(a.length).fill(-1);
+    let c = a.shift();
+    this.current = c;
     for (let n of a) {
-      this.insert(n, c);
+      this.array[c - 1] = n;
       c = n;
     }
+    this.array[c - 1] = this.current;
   }
-  delete(n) {
-    if (this.map.has(n)) {
-      if (this.map.size === 1) {
-        this.map.delete(n);
-      } else if (this.map.size === 2) {
-        const remainingValue = this.map.get(n).next;
-        this.map.set(remainingValue, {
-          value: remainingValue,
-          next: remainingValue,
-          prev: remainingValue,
-        });
-        this.map.delete(n);
-      } else {
-        const before_n = this.map.get(this.map.get(n).prev);
-        const after_n = this.map.get(this.map.get(n).next);
-        this.map.set(before_n.value, {
-          value: before_n.value,
-          prev: before_n.prev,
-          next: after_n.value,
-        });
-        this.map.set(after_n.value, {
-          value: after_n.value,
-          prev: before_n.value,
-          next: after_n.next,
-        });
-        this.map.delete(n);
-      }
-    }
-  }
-  deleteArray(a) {
+  insert(m, a) {
+    // Place elements of array a after element m
+    const next = this.array[m - 1];
+    let c = m;
     for (let n of a) {
-      this.delete(n);
+      this.array[c - 1] = n;
+      c = n;
     }
+    this.array[c - 1] = next;
+  }
+  delete(m, count) {
+    // Remove count elements after m and return them
+    const removedElements = [];
+    for (let i = 0; i < count; i++) {
+      let toBeRemoved = this.array[m - 1];
+      let next = this.array[toBeRemoved - 1];
+      this.array[m - 1] = next;
+      removedElements.push(toBeRemoved);
+    }
+    return removedElements;
   }
   next(n) {
-    return this.map.get(n).next;
-  }
-  prev(n) {
-    return this.map.get(n).prev;
+    return this.array[n - 1];
   }
   current() {
     return this.current;
-  }
-  has(n) {
-    return this.map.has(n);
-  }
-  toArray() {
-    const a = [this.current];
-    let n = this.next(this.current);
-    while (n !== this.current) {
-      a.push(n);
-      n = this.next(n);
-    }
-    return a;
   }
   toArrayAfterOne() {
     const a = [];
@@ -146,30 +62,23 @@ const readInput = (inputFilePath) =>
     .map((n) => parseInt(n));
 
 const iterateCups = (cups) => {
-  const size = cups.size();
   let c = cups.current;
-  const removed = [];
-  for (let i = 0; i < 3; i++) {
-    c = cups.next(c);
-    removed.push(c);
-  }
-  removed.map((r) => cups.delete(r));
-  for (let i = 0; i < 3; i++) {
-    cups.delete(removed[i]);
-  }
-  c = cups.current;
+  const size = cups.size;
+  const removed = cups.delete(c, 3);
+  const removedSet = new Set(removed);
   let destination = null;
   for (let n = 0; n < size; n++) {
     let k = c - 1 - n;
     if (k < 1) {
       k = k + size;
     }
-    if (cups.has(k)) {
+    if (!removedSet.has(k)) {
       destination = k;
       break;
     }
   }
-  cups.insertArray(removed, destination);
+
+  cups.insert(destination, removed);
   cups.current = cups.next(cups.current);
 };
 
