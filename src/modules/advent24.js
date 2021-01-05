@@ -1,5 +1,3 @@
-// Template for a new Advent module
-
 const fs = require('fs');
 
 // Use axial coordinate system
